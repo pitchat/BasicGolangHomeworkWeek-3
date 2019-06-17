@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//Todo object for demo response student
+//Todo object for demo response
 type Todo struct {
 	ID     string `json:"id"`
 	Title  string `json:"title"`
@@ -16,8 +16,8 @@ type Todo struct {
 
 var todos = map[string]*Todo{}
 
+//curl -H "Content-Type: application/json" -X GET http://127.0.0.1:1234/api/todos
 func getTodosHandler(c *gin.Context) {
-	//curl -H "Content-Type: application/json" -X GET http://127.0.0.1:1234/todos
 	tt := []*Todo{}
 	for _, t := range todos {
 		tt = append(tt, t)
@@ -25,9 +25,8 @@ func getTodosHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, tt)
 }
 
+//curl -H "Content-Type: application/json" -X GET http://127.0.0.1:1234/api/todos/1
 func getTodoByIDHandler(c *gin.Context) {
-	//curl -H "Content-Type: application/json" -X GET http://127.0.0.1:1234/todos/1
-
 	id := c.Param("id")
 	t, ok := todos[id]
 	if !ok {
@@ -37,9 +36,8 @@ func getTodoByIDHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 }
 
+//curl -H "Content-Type: application/json" -X POST -d '{"title":"Wake up","status","active"}' http://127.0.0.1:1234/api/todos
 func createTodosHandler(c *gin.Context) {
-
-	//curl -H "Content-Type: application/json" -X POST -d '{"title":"Wake up","status","active"}' http://127.0.0.1:1234/todos
 	t := Todo{}
 	if err := c.ShouldBindJSON(&t); err != nil {
 		c.JSON(http.StatusBadRequest, err)
@@ -53,6 +51,8 @@ func createTodosHandler(c *gin.Context) {
 	todos[id] = &t
 	c.JSON(http.StatusCreated, t)
 }
+
+//curl -H "Content-Type: application/json" -X PUT -d '{"title":"Wake up","status","inactive"}' http://127.0.0.1:1234/api/todos/1
 func updateTodosHandler(c *gin.Context) {
 	id := c.Param("id")
 	t := todos[id]
@@ -64,6 +64,8 @@ func updateTodosHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 
 }
+
+//curl -H "Content-Type: application/json" -X DELETE http://127.0.0.1:1234/api/todos/1
 func deleteTodosHandler(c *gin.Context) {
 	id := c.Param("id")
 	delete(todos, id)
