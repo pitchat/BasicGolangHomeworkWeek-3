@@ -7,52 +7,77 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//Student object for demo response student
-type Student struct {
-	ID   string `json:"student_id"`
-	Name string `json:"name"`
+//Todo object for demo response student
+type Todo struct {
+	ID     string `json:"id"`
+	Title  string `json:"title"`
+	Status string `json:"status"`
 }
 
-var students = map[string]Student{
-	"620001": Student{ID: "620001", Name: "A"},
-	"620002": Student{ID: "620002", Name: "B"},
-	"620003": Student{ID: "620003", Name: "C"},
-}
+var todos = map[string]*Todo{}
 
-//maxID student max id
-var maxID uint64 = 620003
-
-func getStudentHandler(c *gin.Context) {
-	//curl -H "Content-Type: application/json" -X GET http://127.0.0.1:1234/students
-	response := []Student{}
-	for _, s := range students {
-		response = append(response, s)
+func getTodosHandler(c *gin.Context) {
+	//curl -H "Content-Type: application/json" -X GET http://127.0.0.1:1234/todos
+	tt := []*Todo{}
+	for _, t := range todos {
+		tt = append(tt, t)
 	}
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, tt)
 }
 
-func postStudentHandler(c *gin.Context) {
+func getTodoByIDHandler(c *gin.Context) {
+	//curl -H "Content-Type: application/json" -X GET http://127.0.0.1:1234/todos/1
 
-	//curl -H "Content-Type: application/json" -X POST -d '{"name":"new student2"}' http://127.0.0.1:1234/students
-	s := Student{}
-	if err := c.ShouldBindJSON(&s); err != nil {
+	id := c.Param("id")
+	t, ok := todos[id]
+	if !ok {
+		c.JSON(http.StatusOK, gin.H{})
+		return
+	}
+	c.JSON(http.StatusOK, t)
+}
+
+func createTodosHandler(c *gin.Context) {
+
+	//curl -H "Content-Type: application/json" -X POST -d '{"title":"Wake up","status","active"}' http://127.0.0.1:1234/todos
+	t := Todo{}
+	if err := c.ShouldBindJSON(&t); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	maxID = maxID + 1
-	var strID string
-	strID = strconv.FormatUint(maxID, 10)
-	s.ID = strID
-	students[strID] = s
-	c.JSON(http.StatusOK, "id of new student "+strID)
+	i := len(todos)
+	i++
+	id := strconv.Itoa(i)
+	t.ID = id
+	todos[id] = &t
+	c.JSON(http.StatusCreated, t)
+}
+func updateTodosHandler(c *gin.Context) {
+	id := c.Param("id")
+	t := todos[id]
+	if err := c.ShouldBindJSON(t); err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, t)
+
+}
+func deleteTodosHandler(c *gin.Context) {
+	id := c.Param("id")
+	delete(todos, id)
+	c.JSON(http.StatusOK, gin.H{"status": "success"})
+
 }
 
 func main() {
 	r := gin.Default()
-
-	r.GET("/students", getStudentHandler)
-	r.POST("/students", postStudentHandler)
-	r.Run(":1234") //listen and serve on 0.0.0.0:8080
+	r.GET("/api/todos", getTodosHandler)
+	r.GET("/api/todos/:id", getTodoByIDHandler)
+	r.POST("/api/todos", createTodosHandler)
+	r.PUT("/api/todos/:id", updateTodosHandler)
+	r.DELETE("/api/todos/:id", deleteTodosHandler)
+	r.Run(":1234") //listen and serve on 0.0.0.0:1234
 
 }
