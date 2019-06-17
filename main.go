@@ -72,12 +72,13 @@ func deleteTodosHandler(c *gin.Context) {
 }
 
 func main() {
-	r := gin.Default()
-	r.GET("/api/todos", getTodosHandler)
-	r.GET("/api/todos/:id", getTodoByIDHandler)
-	r.POST("/api/todos", createTodosHandler)
-	r.PUT("/api/todos/:id", updateTodosHandler)
-	r.DELETE("/api/todos/:id", deleteTodosHandler)
-	r.Run(":1234") //listen and serve on 0.0.0.0:1234
+	router := gin.Default()
+	api := router.Group("/api")
+	api.GET("/todos", getTodosHandler)
+	api.GET("/todos/:id", getTodoByIDHandler)
+	api.POST("/todos", createTodosHandler)
+	api.PUT("/todos/:id", updateTodosHandler)
+	api.DELETE("/todos/:id", deleteTodosHandler)
+	router.Run(":1234") //listen and serve on 0.0.0.0:1234
 
 }
