@@ -23,6 +23,7 @@ func getTodosHandler(c *gin.Context) {
 		tt = append(tt, t)
 	}
 	c.JSON(http.StatusOK, tt)
+	
 }
 
 //curl -H "Content-Type: application/json" -X GET http://127.0.0.1:1234/api/todos/1
@@ -34,6 +35,7 @@ func getTodoByIDHandler(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, t)
+
 }
 
 //curl -H "Content-Type: application/json" -X POST -d '{"title":"Wake up","status","active"}' http://127.0.0.1:1234/api/todos
@@ -50,6 +52,7 @@ func createTodosHandler(c *gin.Context) {
 	t.ID = id
 	todos[id] = &t
 	c.JSON(http.StatusCreated, t)
+
 }
 
 //curl -H "Content-Type: application/json" -X PUT -d '{"title":"Wake up","status","inactive"}' http://127.0.0.1:1234/api/todos/1
